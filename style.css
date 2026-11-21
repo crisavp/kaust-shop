@@ -127,9 +127,9 @@ dialog::backdrop { background: rgba(0,0,0,.55); }
   z-index: 2; width: 38px; height: 38px; border-radius: 50%;
   border: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer;
 }
-.gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #000; scrollbar-width: none; }
+.gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: var(--surface); scrollbar-width: none; }
 .gallery::-webkit-scrollbar { display: none; }
-.gallery img, .gallery .noimg { flex: none; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; scroll-snap-align: center; background: #000; }
+.gallery img, .gallery .noimg { flex: none; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; scroll-snap-align: center; background: var(--surface); }
 .gallery .noimg { background: var(--line); }
 .thumbs { display: flex; gap: 6px; padding: 8px 16px 0; overflow-x: auto; }
 .thumbs:empty { display: none; }
