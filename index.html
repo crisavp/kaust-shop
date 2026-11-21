@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Second-hand at KAUST</title>
+  <meta name="description" content="Second-hand items for sale on the KAUST campus. Tap an item to see photos and reserve on WhatsApp.">
+  <meta property="og:title" content="Second-hand at KAUST">
+  <meta property="og:description" content="Second-hand items for sale on campus. Reserve on WhatsApp, pay cash or transfer at pickup.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1f4e5a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f4e5a'/%3E%3Cpath d='M18 26h28l-3 22H21z' fill='none' stroke='%23fff' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M25 26v-4a7 7 0 0 1 14 0v4' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1 id="shop-name">Second-hand at KAUST</h1>
+      <p class="tagline">Tap an item to see the photos and reserve it on WhatsApp.</p>
+      <ul class="info" id="info" hidden></ul>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls" aria-label="Filter items">
+      <input type="search" id="search" placeholder="Search items" aria-label="Search items" autocomplete="off">
+      <div class="row">
+        <select id="sort" aria-label="Sort by">
+          <option value="new">Newest first</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="saving">Biggest saving</option>
+        </select>
+        <label class="toggle"><input type="checkbox" id="show-sold"> Show sold</label>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Categories"></div>
+    </section>
+
+    <p class="status-msg" id="status-msg">Loading items…</p>
+    <section class="grid" id="grid" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Prices in <span id="currency-foot">SAR</span>. Items are reserved in order of message.</div>
+  </footer>
+
+  <dialog id="item-dialog" aria-labelledby="d-title">
+    <div class="d-inner">
+      <button class="d-close" id="d-close" aria-label="Close">&times;</button>
+      <div class="gallery" id="d-gallery"></div>
+      <div class="thumbs" id="d-thumbs"></div>
+      <div class="d-body">
+        <div class="d-meta"><span class="id-tag" id="d-id"></span><span id="d-badges"></span></div>
+        <h2 id="d-title"></h2>
+        <div class="d-price" id="d-price"></div>
+        <div class="d-saving" id="d-saving"></div>
+        <dl class="d-facts" id="d-facts"></dl>
+        <p class="d-desc" id="d-desc"></p>
+        <div class="d-actions">
+          <a class="btn btn-wa" id="d-reserve" target="_blank" rel="noopener">Reserve on WhatsApp</a>
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="d-copy">Copy item ID</button>
+            <button class="btn btn-ghost" id="d-share">Share item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
