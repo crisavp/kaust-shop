@@ -60,19 +60,24 @@ function toItems(rows) {
   const col = (...names) => head.findIndex((h) => names.includes(h));
   const ix = {
     id: col('id'), title: col('title'), category: col('category'),
-    price: col('pricesar', 'price'), status: col('status'), condition: col('condition'),
+    price: col('pricesar', 'price'), qty: col('quantity', 'qty'), status: col('status'), condition: col('condition'),
     newPrice: col('newpricesar', 'newprice'), newLink: col('newpricelink'),
     description: col('description'), details: col('details'), date: col('dateadded', 'date'),
   };
   const get = (r, k) => (ix[k] >= 0 ? (r[ix[k]] ?? '').trim() : '');
   return rows.slice(1).map((r, n) => {
-    const status = get(r, 'status').toLowerCase() || 'available';
+    let status = get(r, 'status').toLowerCase() || 'available';
+    if (!['available', 'reserved', 'sold'].includes(status)) status = 'available';
+    const q = num(get(r, 'qty'));
+    const qty = q == null ? 1 : Math.max(0, Math.floor(q));
+    if (qty === 0) status = 'sold';
     return {
       id: get(r, 'id'),
       title: get(r, 'title'),
       category: get(r, 'category') || 'Other',
       price: num(get(r, 'price')),
-      status: ['available', 'reserved', 'sold'].includes(status) ? status : 'available',
+      qty,
+      status,
       condition: get(r, 'condition'),
       newPrice: num(get(r, 'newPrice')),
       newLink: safeUrl(get(r, 'newLink')),
@@ -189,7 +194,7 @@ function renderHeader() {
   $('currency-foot').textContent = currency();
   const step3 = [s.pickup, s.payment].filter(Boolean).join(' ');
   if (step3) $('step3').textContent = step3;
-  const n = state.items.filter((it) => it.status === 'available').length;
+  const n = state.items.filter((it) => it.status === 'available').reduce((sum, it) => sum + it.qty, 0);
   $('count').textContent = `${n} item${n === 1 ? '' : 's'} available`;
 }
 
@@ -231,7 +236,7 @@ function cardHTML(it) {
       <div class="cat">${esc(it.category)}</div>
       <div class="title">${esc(it.title)}</div>
       <div class="prices"><span class="price">${esc(fmt(it.price))}</span>${it.newPrice && sv ? `<span class="was">${esc(fmt(it.newPrice))}</span>` : ''}</div>
-      ${it.condition ? `<div class="cond">${esc(it.condition)}</div>` : ''}
+      <div class="cond">${esc(it.condition)}${it.qty > 1 && it.status !== 'sold' ? `<span class="qty">${it.qty} available</span>` : ''}</div>
     </div>
   </button>`;
 }
@@ -269,7 +274,12 @@ function openItem(id, push = true) {
   $('d-saving').innerHTML = sv
     ? `You save <strong>${esc(fmt(sv.amount))} (${sv.pct}%)</strong> compared with buying it new.${it.newLink ? ` <a href="${esc(it.newLink)}" target="_blank" rel="noopener nofollow">See the new price</a>` : ''}`
     : '';
-  const facts = [['Condition', it.condition], ['Category', it.category], ['Details', it.details]].filter(([, v]) => v);
+  const facts = [
+    ['Condition', it.condition],
+    ['Available', it.qty > 1 && it.status !== 'sold' ? `${it.qty} pieces` : ''],
+    ['Category', it.category],
+    ['Details', it.details],
+  ].filter(([, v]) => v);
   $('d-facts').innerHTML = facts.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
   $('d-desc').textContent = it.description;
 
