@@ -30,6 +30,10 @@ A one-page shop for selling second-hand items on campus. Buyers browse the items
 | `scripts/sync_photos.py` | Turns the Drive Photos download into `photos/` |
 | `template/` | The original sheet template and the script that built it |
 
+## Releasing a design or code change
+
+Run `scripts/bump_version.sh` before committing a change to `style.css` or `app.js`. It stamps the links in `index.html` with a new version so phones don't keep using cached copies (GitHub Pages lets browsers cache files for 10 minutes).
+
 ## Local preview
 
 ```bash
