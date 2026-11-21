@@ -187,9 +187,10 @@ function renderHeader() {
   const s = state.settings;
   if (s.shopname) { $('shop-name').textContent = s.shopname; document.title = s.shopname; }
   $('currency-foot').textContent = currency();
-  const info = [s.pickup, s.payment].filter(Boolean);
-  $('info').innerHTML = info.map((t) => `<li>${esc(t)}</li>`).join('');
-  $('info').hidden = !info.length;
+  const step3 = [s.pickup, s.payment].filter(Boolean).join(' ');
+  if (step3) $('step3').textContent = step3;
+  const n = state.items.filter((it) => it.status === 'available').length;
+  $('count').textContent = `${n} item${n === 1 ? '' : 's'} available`;
 }
 
 function visibleBase() {
@@ -222,14 +223,15 @@ function cardHTML(it) {
   const sv = saving(it);
   const badge = it.status === 'reserved' ? '<span class="badge b-reserved">Reserved</span>'
     : it.status === 'sold' ? '<span class="badge b-sold">Sold</span>' : '<span></span>';
-  const save = sv && it.status !== 'sold' ? `<span class="badge b-save">-${sv.pct}%</span>` : '';
+  const save = sv && it.status !== 'sold' ? `<span class="badge b-save">Save ${sv.pct}%</span>` : '';
   const img = ph ? `<img src="${ph.thumb}" alt="" loading="lazy" decoding="async">` : '<div class="noimg">Photo coming soon</div>';
   return `<button class="card${it.status === 'sold' ? ' is-sold' : ''}" type="button" data-id="${esc(it.id)}">
     <div class="ph">${img}<div class="badges">${badge}${save}</div></div>
     <div class="body">
+      <div class="cat">${esc(it.category)}</div>
       <div class="title">${esc(it.title)}</div>
-      <div class="sub">${esc([it.condition, it.category].filter(Boolean).join(' · '))}</div>
-      <div class="prices"><span class="price">${esc(fmt(it.price))}</span>${it.newPrice && sv ? `<span class="was">New ${esc(fmt(it.newPrice))}</span>` : ''}</div>
+      <div class="prices"><span class="price">${esc(fmt(it.price))}</span>${it.newPrice && sv ? `<span class="was">${esc(fmt(it.newPrice))}</span>` : ''}</div>
+      ${it.condition ? `<div class="cond">${esc(it.condition)}</div>` : ''}
     </div>
   </button>`;
 }
@@ -273,9 +275,9 @@ function openItem(id, push = true) {
 
   const btn = $('d-reserve');
   if (it.status === 'sold') {
-    btn.textContent = 'Sold'; btn.setAttribute('aria-disabled', 'true'); btn.removeAttribute('href');
+    $('d-reserve-text').textContent = 'Sold'; btn.setAttribute('aria-disabled', 'true'); btn.removeAttribute('href');
   } else {
-    btn.textContent = it.status === 'reserved' ? 'Reserved. Ask on WhatsApp' : 'Reserve on WhatsApp';
+    $('d-reserve-text').textContent = it.status === 'reserved' ? 'Reserved. Ask on WhatsApp' : 'Reserve on WhatsApp';
     btn.removeAttribute('aria-disabled'); btn.href = waLink(it);
   }
 
@@ -348,5 +350,18 @@ $('d-share').addEventListener('click', async () => {
   }
   if (await copy(`${text}\n${url}`)) toast('Link copied');
 });
+
+/* ---------- Theme (light by default, dark on request) ---------- */
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $('theme-btn').setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = getComputedStyle(document.documentElement).getPropertyValue('--topbar').trim() || '#ffffff';
+  try { localStorage.setItem('shop-theme', t); } catch (_) { /* ignore */ }
+}
+$('theme-btn').addEventListener('click', () => {
+  setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+});
+setTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
 
 load();
